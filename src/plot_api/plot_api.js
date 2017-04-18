@@ -279,6 +279,20 @@ Plotly.plot = function(gd, data, layout, config) {
         return Plotly.Axes.doTicks(gd, 'redraw');
     }
 
+    function marginPusherForAxes() {
+        var bbox = gd._fullLayout.xaxis._boundingBox;
+
+        Plots.autoMargin(gd, 'xaxis', {
+            x: 1,
+            y: 0,
+            l: 0,
+            r: bbox.width,
+            b: bbox.height,
+            t: 0
+        });
+        Plots.doAutoMargin(gd);
+    }
+
     // Now plot the data
     function drawData() {
         var calcdata = gd.calcdata,
@@ -361,6 +375,7 @@ Plotly.plot = function(gd, data, layout, config) {
         positionAndAutorange,
         subroutines.layoutStyles,
         drawAxes,
+        marginPusherForAxes,
         drawData,
         finalDraw,
         Plots.rehover
