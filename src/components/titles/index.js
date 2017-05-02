@@ -94,7 +94,7 @@ Titles.draw = function(gd, titleClass, options) {
         .attr('class', titleClass);
 
     function titleLayout(titleEl) {
-        Lib.syncOrAsync([drawTitle, scootTitle], titleEl);
+        Lib.syncOrAsync([drawTitle, /*scootTitle*/], titleEl);
     }
 
     function drawTitle(titleEl) {

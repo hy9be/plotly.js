@@ -1856,17 +1856,17 @@ axes.doTicks = function(gd, axid, skipTitle) {
                         x = ax.l2p(d.x);
                     if(thisLabel.empty()) thisLabel = s.select('text');
 
-                    var bb = Drawing.bBox(thisLabel.node());
+                    var bbWidth = d.text.length * 7 * d.fontSize / 11;
 
                     lbbArray.push({
                         // ignore about y, just deal with x overlaps
                         top: 0,
                         bottom: 10,
                         height: 10,
-                        left: x - bb.width / 2,
+                        left: x - bbWidth / 2,
                         // impose a 2px gap
-                        right: x + bb.width / 2 + 2,
-                        width: bb.width + 2
+                        right: x + bbWidth / 2 + 2,
+                        width: bbWidth + 2
                     });
                 });
                 for(i = 0; i < lbbArray.length - 1; i++) {
