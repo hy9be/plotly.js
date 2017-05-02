@@ -12,6 +12,8 @@
 var d3 = require('d3');
 var isNumeric = require('fast-isnumeric');
 
+var dom = require('../../components/drawing/dom')
+
 var Registry = require('../../registry');
 var Lib = require('../../lib');
 var svgTextUtils = require('../../lib/svg_text_utils');
@@ -1856,36 +1858,43 @@ axes.doTicks = function(gd, axid, skipTitle) {
                         x = ax.l2p(d.x);
                     if(thisLabel.empty()) thisLabel = s.select('text');
 
-                    var bb = Drawing.bBox(thisLabel.node());
+                    dom.read(function () {
+                        var bb = Drawing.bBox(thisLabel.node());
 
-                    lbbArray.push({
-                        // ignore about y, just deal with x overlaps
-                        top: 0,
-                        bottom: 10,
-                        height: 10,
-                        left: x - bb.width / 2,
-                        // impose a 2px gap
-                        right: x + bb.width / 2 + 2,
-                        width: bb.width + 2
+                        lbbArray.push({
+                            // ignore about y, just deal with x overlaps
+                            top: 0,
+                            bottom: 10,
+                            height: 10,
+                            left: x - bb.width / 2,
+                            // impose a 2px gap
+                            right: x + bb.width / 2 + 2,
+                            width: bb.width + 2
+                        });
+
+                        if (lbbArray.length === tickLabels.length) {
+                            dom.write(function () {
+                                for(i = 0; i < lbbArray.length - 1; i++) {
+                                    if(Lib.bBoxIntersect(lbbArray[i], lbbArray[i + 1])) {
+                                        // any overlap at all - set 30 degrees
+                                        autoangle = 30;
+                                        break;
+                                    }
+                                }
+                                if(autoangle) {
+                                    var tickspacing = Math.abs(
+                                            (vals[vals.length - 1].x - vals[0].x) * ax._m
+                                        ) / (vals.length - 1);
+                                    if(tickspacing < maxFontSize * 2.5) {
+                                        autoangle = 90;
+                                    }
+                                    positionLabels(tickLabels, autoangle);
+                                }
+                                ax._lastangle = autoangle;
+                            });
+                        }
                     });
                 });
-                for(i = 0; i < lbbArray.length - 1; i++) {
-                    if(Lib.bBoxIntersect(lbbArray[i], lbbArray[i + 1])) {
-                        // any overlap at all - set 30 degrees
-                        autoangle = 30;
-                        break;
-                    }
-                }
-                if(autoangle) {
-                    var tickspacing = Math.abs(
-                            (vals[vals.length - 1].x - vals[0].x) * ax._m
-                        ) / (vals.length - 1);
-                    if(tickspacing < maxFontSize * 2.5) {
-                        autoangle = 90;
-                    }
-                    positionLabels(tickLabels, autoangle);
-                }
-                ax._lastangle = autoangle;
             }
 
             // update the axis title
