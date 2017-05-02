@@ -12,8 +12,6 @@
 var d3 = require('d3');
 var isNumeric = require('fast-isnumeric');
 
-var dom = require('../../components/drawing/dom');
-
 var Registry = require('../../registry');
 var Lib = require('../../lib');
 var svgTextUtils = require('../../lib/svg_text_utils');
@@ -1858,7 +1856,7 @@ axes.doTicks = function(gd, axid, skipTitle) {
                         x = ax.l2p(d.x);
                     if(thisLabel.empty()) thisLabel = s.select('text');
 
-                    dom.read(function () {
+                    Drawing.readDom(function () {
                         var bb = Drawing.bBox(thisLabel.node());
 
                         lbbArray.push({
@@ -1873,7 +1871,7 @@ axes.doTicks = function(gd, axid, skipTitle) {
                         });
 
                         if (lbbArray.length === tickLabels.length) {
-                            dom.write(function () {
+                            Drawing.writeDom(function () {
                                 for(i = 0; i < lbbArray.length - 1; i++) {
                                     if(Lib.bBoxIntersect(lbbArray[i], lbbArray[i + 1])) {
                                         // any overlap at all - set 30 degrees

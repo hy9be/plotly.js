@@ -12,8 +12,6 @@
 var d3 = require('d3');
 var isNumeric = require('fast-isnumeric');
 
-var dom = require('../../components/drawing/dom');
-
 var Plotly = require('../../plotly');
 var Plots = require('../../plots/plots');
 var Lib = require('../../lib');
@@ -146,7 +144,7 @@ Titles.draw = function(gd, titleClass, options) {
                     bottom: fullLayout.height
                 };
 
-                dom.read(function () {
+                Drawing.readDom(function () {
                     var titlebb = Drawing.bBox(titleGroup.node()),
                         maxshift = avoid.maxShift || (
                             (paperbb[avoid.side] - titlebb[avoid.side]) *

@@ -12,6 +12,8 @@
 var d3 = require('d3');
 var isNumeric = require('fast-isnumeric');
 
+var fastdom = require('fastdom');
+
 var Registry = require('../../registry');
 var Color = require('../color');
 var Colorscale = require('../colorscale');
@@ -700,4 +702,15 @@ drawing.measureText = function(tester, text, font) {
     var bbox = drawing.bBox(dummyText.node());
     dummyText.remove();
     return bbox;
+};
+
+/*
+ * fastdom batch read and write utils
+ */
+drawing.readDom = function(callback) {
+    return fastdom.measure(callback);
+};
+
+drawing.writeDom = function(callback) {
+    return fastdom.mutate(callback);
 };
