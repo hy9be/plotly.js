@@ -12,6 +12,7 @@
         this.storage = [];
         this.tagName = params.tagName.toLowerCase();
         this.namespace = params.namespace;
+        this.templateNode = this.namespace?document.createElementNS(params.namespace, params.tagName):document.createElement(params.tagName);
     }
 
     Pool.prototype.push = function(el) {
@@ -45,7 +46,8 @@
 
         var difference = size - this.storage.length;
         for (var poolAllocIter = 0; poolAllocIter < difference; poolAllocIter++) {
-            this.storage.push(this.create());
+            //this.storage.push(this.create());
+            this.storage.push(this.templateNode.cloneNode());
         }
     };
 
