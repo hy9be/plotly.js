@@ -1844,19 +1844,33 @@ axes.doTicks = function(gd, axid, skipTitle) {
         function fixLabelOverlaps() {
             positionLabels(tickLabels, ax.tickangle);
 
+            // According to an empirical formula
+            function estimateTextWidth(labelNode, d) {
+                return {width: d.text.length * 7 * d.fontSize / 11};
+            }
+
             // check for auto-angling if x labels overlap
             // don't auto-angle at all for log axes with
             // base and digit format
             if(axLetter === 'x' && !isNumeric(ax.tickangle) &&
                     (ax.type !== 'log' || String(ax.dtick).charAt(0) !== 'D')) {
-                var lbbArray = [];
+                var lbbArray = [],
+                    measureFunc;
+
+                // if there are too many labels, let's just estimate rather than measure the width of the length
+                if(tickLabels.size() > 200) {
+                    measureFunc = estimateTextWidth;
+                } else {
+                    measureFunc = Drawing.bBox;
+                }
+
                 tickLabels.each(function(d) {
                     var s = d3.select(this),
                         thisLabel = s.select('.text-math-group'),
                         x = ax.l2p(d.x);
                     if(thisLabel.empty()) thisLabel = s.select('text');
 
-                    var bbWidth = d.text.length * 7 * d.fontSize / 11;
+                    var bbWidth = measureFunc(thisLabel.node(), d).width;
 
                     lbbArray.push({
                         // ignore about y, just deal with x overlaps
