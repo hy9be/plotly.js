@@ -12,6 +12,8 @@
 var d3 = require('d3');
 var isNumeric = require('fast-isnumeric');
 
+var dom = require('../../components/drawing/dom');
+
 var Plotly = require('../../plotly');
 var Plots = require('../../plots/plots');
 var Lib = require('../../lib');
@@ -137,50 +139,53 @@ Titles.draw = function(gd, titleClass, options) {
                 shiftSign = (['left', 'top'].indexOf(avoid.side) !== -1) ?
                     -1 : 1,
                 pad = isNumeric(avoid.pad) ? avoid.pad : 2,
-                titlebb = Drawing.bBox(titleGroup.node()),
                 paperbb = {
                     left: 0,
                     top: 0,
                     right: fullLayout.width,
                     bottom: fullLayout.height
-                },
-                maxshift = avoid.maxShift || (
-                    (paperbb[avoid.side] - titlebb[avoid.side]) *
-                    ((avoid.side === 'left' || avoid.side === 'top') ? -1 : 1));
-            // Prevent the title going off the paper
-            if(maxshift < 0) shift = maxshift;
-            else {
-                // so we don't have to offset each avoided element,
-                // give the title the opposite offset
-                var offsetLeft = avoid.offsetLeft || 0,
-                    offsetTop = avoid.offsetTop || 0;
-                titlebb.left -= offsetLeft;
-                titlebb.right -= offsetLeft;
-                titlebb.top -= offsetTop;
-                titlebb.bottom -= offsetTop;
+                };
 
-                // iterate over a set of elements (avoid.selection)
-                // to avoid collisions with
-                avoid.selection.each(function() {
-                    var avoidbb = Drawing.bBox(this);
+                dom.read(function () {
+                    var titlebb = Drawing.bBox(titleGroup.node()),
+                        maxshift = avoid.maxShift || (
+                            (paperbb[avoid.side] - titlebb[avoid.side]) *
+                            ((avoid.side === 'left' || avoid.side === 'top') ? -1 : 1));
+                    // Prevent the title going off the paper
+                    if(maxshift < 0) shift = maxshift;
+                    else {
+                        // so we don't have to offset each avoided element,
+                        // give the title the opposite offset
+                        var offsetLeft = avoid.offsetLeft || 0,
+                            offsetTop = avoid.offsetTop || 0;
+                        titlebb.left -= offsetLeft;
+                        titlebb.right -= offsetLeft;
+                        titlebb.top -= offsetTop;
+                        titlebb.bottom -= offsetTop;
 
-                    if(Lib.bBoxIntersect(titlebb, avoidbb, pad)) {
-                        shift = Math.max(shift, shiftSign * (
-                            avoidbb[avoid.side] - titlebb[backside]) + pad);
+                        // iterate over a set of elements (avoid.selection)
+                        // to avoid collisions with
+                        avoid.selection.each(function() {
+                            var avoidbb = Drawing.bBox(this);
+
+                            if(Lib.bBoxIntersect(titlebb, avoidbb, pad)) {
+                                shift = Math.max(shift, shiftSign * (
+                                    avoidbb[avoid.side] - titlebb[backside]) + pad);
+                            }
+                        });
+                        shift = Math.min(maxshift, shift);
+                    }
+                    if(shift > 0 || maxshift < 0) {
+                        var shiftTemplate = {
+                            left: [-shift, 0],
+                            right: [shift, 0],
+                            top: [0, -shift],
+                            bottom: [0, shift]
+                        }[avoid.side];
+                        titleGroup.attr('transform',
+                            'translate(' + shiftTemplate + ')');
                     }
                 });
-                shift = Math.min(maxshift, shift);
-            }
-            if(shift > 0 || maxshift < 0) {
-                var shiftTemplate = {
-                    left: [-shift, 0],
-                    right: [shift, 0],
-                    top: [0, -shift],
-                    bottom: [0, shift]
-                }[avoid.side];
-                titleGroup.attr('transform',
-                    'translate(' + shiftTemplate + ')');
-            }
         }
     }
 

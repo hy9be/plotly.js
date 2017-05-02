@@ -12,7 +12,7 @@
 var d3 = require('d3');
 var isNumeric = require('fast-isnumeric');
 
-var dom = require('../../components/drawing/dom')
+var dom = require('../../components/drawing/dom');
 
 var Registry = require('../../registry');
 var Lib = require('../../lib');
