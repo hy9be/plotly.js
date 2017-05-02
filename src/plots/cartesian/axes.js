@@ -1798,35 +1798,37 @@ axes.doTicks = function(gd, axid, skipTitle) {
         });
 
         function positionLabels(s, angle) {
-            s.each(function(d) {
-                var anchor = labelanchor(angle);
-                var thisLabel = d3.select(this),
-                    mathjaxGroup = thisLabel.select('.text-math-group'),
-                    transform = transfn(d) +
-                        ((isNumeric(angle) && +angle !== 0) ?
-                        (' rotate(' + angle + ',' + labelx(d) + ',' +
-                            (labely(d) - d.fontSize / 2) + ')') :
-                        '');
-                if(mathjaxGroup.empty()) {
-                    var txt = thisLabel.select('text').attr({
-                        transform: transform,
-                        'text-anchor': anchor
-                    });
-
-                    if(!txt.empty()) {
-                        txt.selectAll('tspan.line').attr({
-                            x: txt.attr('x'),
-                            y: txt.attr('y')
+            Drawing.writeDom(function() {
+                s.each(function (d) {
+                    var anchor = labelanchor(angle);
+                    var thisLabel = d3.select(this),
+                        mathjaxGroup = thisLabel.select('.text-math-group'),
+                        transform = transfn(d) +
+                            ((isNumeric(angle) && +angle !== 0) ?
+                                (' rotate(' + angle + ',' + labelx(d) + ',' +
+                                (labely(d) - d.fontSize / 2) + ')') :
+                                '');
+                    if (mathjaxGroup.empty()) {
+                        var txt = thisLabel.select('text').attr({
+                            transform: transform,
+                            'text-anchor': anchor
                         });
+
+                        if (!txt.empty()) {
+                            txt.selectAll('tspan.line').attr({
+                                x: txt.attr('x'),
+                                y: txt.attr('y')
+                            });
+                        }
                     }
-                }
-                else {
-                    var mjShift =
-                        Drawing.bBox(mathjaxGroup.node()).width *
+                    else {
+                        var mjShift =
+                            Drawing.bBox(mathjaxGroup.node()).width *
                             {end: -0.5, start: 0.5}[anchor];
-                    mathjaxGroup.attr('transform', transform +
-                        (mjShift ? 'translate(' + mjShift + ',0)' : ''));
-                }
+                        mathjaxGroup.attr('transform', transform +
+                            (mjShift ? 'translate(' + mjShift + ',0)' : ''));
+                    }
+                });
             });
         }
 
@@ -1856,7 +1858,7 @@ axes.doTicks = function(gd, axid, skipTitle) {
                         x = ax.l2p(d.x);
                     if(thisLabel.empty()) thisLabel = s.select('text');
 
-                    Drawing.readDom(function () {
+                    Drawing.readDom(function() {
                         var bb = Drawing.bBox(thisLabel.node());
 
                         lbbArray.push({
@@ -1871,7 +1873,7 @@ axes.doTicks = function(gd, axid, skipTitle) {
                         });
 
                         if (lbbArray.length === tickLabels.length) {
-                            Drawing.writeDom(function () {
+                            Drawing.writeDom(function() {
                                 for(i = 0; i < lbbArray.length - 1; i++) {
                                     if(Lib.bBoxIntersect(lbbArray[i], lbbArray[i + 1])) {
                                         // any overlap at all - set 30 degrees

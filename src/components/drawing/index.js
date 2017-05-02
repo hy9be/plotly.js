@@ -42,8 +42,16 @@ drawing.font = function(s, family, size, color) {
     if(color) s.call(Color.fill, color);
 };
 
-drawing.setPosition = function(s, x, y) { s.attr('x', x).attr('y', y); };
-drawing.setSize = function(s, w, h) { s.attr('width', w).attr('height', h); };
+drawing.setPosition = function(s, x, y) {
+    drawing.writeDom(function() {
+        s.attr('x', x).attr('y', y);
+    });
+};
+drawing.setSize = function(s, w, h) {
+    drawing.writeDom(function() {
+        s.attr('width', w).attr('height', h);
+    });
+};
 drawing.setRect = function(s, x, y, w, h) {
     s.call(drawing.setPosition, x, y).call(drawing.setSize, w, h);
 };
