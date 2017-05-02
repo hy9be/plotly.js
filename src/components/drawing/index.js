@@ -544,8 +544,6 @@ drawing.bBox = function(node) {
             .node().getBoundingClientRect();
     }
 
-    drawing.tester.removeChild(testNode);
-
     var bb = {
         height: testRect.height,
         width: testRect.width,

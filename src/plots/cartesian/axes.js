@@ -1890,6 +1890,12 @@ axes.doTicks = function(gd, axid, skipTitle) {
                                 }
                                 ax._lastangle = autoangle;
                             });
+
+                            // batch remove the measuring nodes
+                            var tester = Drawing.tester;
+                            while (tester.firstChild) {
+                                tester.removeChild(tester.firstChild);
+                            }
                         }
                     });
                 });
