@@ -1,4 +1,73 @@
 !function() {
+
+    function Pool(params) {
+        if (typeof params !== 'object') {
+            throw new Error("Please pass parameters. Example -> new Pool({ tagName: \"div\" })");
+        }
+
+        if (typeof params.tagName !== 'string') {
+            throw new Error("Please specify a tagName. Example -> new Pool({ tagName: \"div\" })");
+        }
+
+        this.storage = [];
+        this.tagName = params.tagName.toLowerCase();
+        this.namespace = params.namespace;
+    }
+
+    Pool.prototype.push = function(el) {
+        if (el.tagName.toLowerCase() !== this.tagName) {
+            return;
+        }
+
+        this.storage.push(el);
+    };
+
+    Pool.prototype.pop = function(argument) {
+        if (this.storage.length === 0) {
+            return this.create();
+        } else {
+            return this.storage.pop();
+        }
+    };
+
+    Pool.prototype.create = function() {
+        if (this.namespace) {
+            return document.createElementNS(this.namespace, this.tagName);
+        } else {
+            return document.createElement(this.tagName);
+        }
+    };
+
+    Pool.prototype.allocate = function(size) {
+        if (this.storage.length >= size) {
+            return;
+        }
+
+        var difference = size - this.storage.length;
+        for (var poolAllocIter = 0; poolAllocIter < difference; poolAllocIter++) {
+            this.storage.push(this.create());
+        }
+    };
+
+    if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+        module.exports = Pool;
+    }
+
+    // Create pools for <g> and <path>
+    window.domPool.gPool = new domPool({
+        namespace: 'http://www.w3.org/2000/svg',
+        tagName: 'g'
+    });
+
+    window.domPool.gPool.allocate(300000);
+
+    window.domPool.pathPool = new domPool({
+        namespace: 'http://www.w3.org/2000/svg',
+        tagName: 'path'
+    });
+
+    window.domPool.pathPool.allocate(300000);
+
     var d3 = {
         version: "3.5.17"
     };
@@ -809,6 +878,11 @@
             return namespace === d3_nsXhtml && document.documentElement.namespaceURI === d3_nsXhtml ? document.createElement(name) : document.createElementNS(namespace, name);
         }
         function createNS() {
+            if (name === 'path') {
+                return window.domPool.pathPool.pop();
+            } else if (name === 'g') {
+                return window.domPool.gPool.pop();
+            }
             return this.ownerDocument.createElementNS(name.space, name.local);
         }
         return typeof name === "function" ? name : (name = d3.ns.qualify(name)).local ? createNS : create;
@@ -824,6 +898,14 @@
         return this.each(d3_selectionRemove);
     };
     function d3_selectionRemove() {
+        if (name === 'path') {
+            window.domPool.pathPool.push(this);
+            return;
+        } else if (name === 'g') {
+            window.domPool.gPool.push(this);
+            return
+        }
+
         var parent = this.parentNode;
         if (parent) parent.removeChild(this);
     }
