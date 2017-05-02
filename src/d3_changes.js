@@ -53,15 +53,17 @@
         module.exports = Pool;
     }
 
+    window.domPool = {}
+
     // Create pools for <g> and <path>
-    window.domPool.gPool = new domPool({
+    window.domPool.gPool = new Pool({
         namespace: 'http://www.w3.org/2000/svg',
         tagName: 'g'
     });
 
     window.domPool.gPool.allocate(300000);
 
-    window.domPool.pathPool = new domPool({
+    window.domPool.pathPool = new Pool({
         namespace: 'http://www.w3.org/2000/svg',
         tagName: 'path'
     });
@@ -874,6 +876,11 @@
     };
     function d3_selection_creator(name) {
         function create() {
+            if (name === 'path') {
+                return window.domPool.pathPool.pop();
+            } else if (name === 'g') {
+                return window.domPool.gPool.pop();
+            }
             var document = this.ownerDocument, namespace = this.namespaceURI;
             return namespace === d3_nsXhtml && document.documentElement.namespaceURI === d3_nsXhtml ? document.createElement(name) : document.createElementNS(namespace, name);
         }
