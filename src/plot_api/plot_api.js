@@ -280,17 +280,19 @@ Plotly.plot = function(gd, data, layout, config) {
     }
 
     function marginPusherForAxes() {
-        var bbox = gd._fullLayout.xaxis._boundingBox;
+        if (gd._fullLayout.xaxis) {
+            var bbox = gd._fullLayout.xaxis._boundingBox;
 
-        Plots.autoMargin(gd, 'xaxis', {
-            x: 1,
-            y: 0,
-            l: 0,
-            r: bbox.width,
-            b: bbox.height,
-            t: 0
-        });
-        Plots.doAutoMargin(gd);
+            Plots.autoMargin(gd, 'xaxis', {
+                x: 1,
+                y: 0,
+                l: 0,
+                r: bbox.width,
+                b: bbox.height,
+                t: 0
+            });
+            Plots.doAutoMargin(gd);
+        }
     }
 
     // Now plot the data
