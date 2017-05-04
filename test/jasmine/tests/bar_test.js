@@ -772,7 +772,7 @@ describe('A bar plot', function() {
     }
 
     function getAllBarNodes(node) {
-        return node.querySelectorAll('g.point');
+        return node.querySelectorAll('g.points path');
     }
 
     function assertTextIsInsidePath(textNode, pathNode) {
